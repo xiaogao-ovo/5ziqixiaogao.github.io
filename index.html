@@ -1,37 +1,47 @@
 <!DOCTYPE html>
-<html lang="zh">
-<head>
+<html>
+  <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猜数字游戏</title>
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-    <header>
-        <h1>猜数字游戏</h1>
-    </header>
-
-    <main>
-        <section class="container">
-            <p>请选择游戏难度：</p>
-            <nav class="nav-difficulty">
-                <button id="btn-easy">简单</button>
-                <button id="btn-medium">中等</button>
-                <button id="btn-hard">困难</button>
-            </nav>
-
-            <div id="game-section" class="game-off">
-                <label for="guess">输入你的猜测：</label>
-                <input type="text" id="guess" pattern="[0-9]*" maxlength="2">
-                <button id="btn-submit" disabled>提交</button>
-                <p id="message"></p>
-                <p id="attempts"></p>
-                <p class="alert" id="warning"></p>
-                <button id="btn-new-game">开始新游戏</button>
-            </div>
-        </section>
-    </main>
-
-    <script src="./script.js"></script>
-</body>
+    <title>五子棋</title>
+    <style>
+      .chessboard {
+        width: 600px;
+        height: 600px;
+        background-color: #FFE1A5;
+        margin: 0 auto;
+        position: relative;
+      }
+      .chessboard div {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #F2D9D0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform: translate(-50%, -50%);
+      }
+      .chess {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #000000;
+        cursor: pointer;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        transition: opacity 0.3s ease-in-out;
+      }
+      .chess.opacity {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chessboard"></div>
+    <script src="./index.js"></script>
+  </body>
 </html>
