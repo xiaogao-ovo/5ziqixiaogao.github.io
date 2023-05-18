@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>猜数字</title>
+</head>
+<body>
+	<h1>猜数字游戏</h1>
+	<p>在0到100之间猜一个数字。</p>
+	
+	<label for="guess">输入你的猜测：</label>
+	<input type="text" id="guess">
+	<button onclick="checkGuess()">提交</button>
+
+	<p id="message"></p>
+	
+	<script>
+		var randomNumber = Math.floor(Math.random() * 101);
+		
+		function checkGuess() {
+			var guess = parseInt(document.getElementById("guess").value);
+			
+			if (guess === randomNumber) {
+				document.getElementById("message").innerHTML = "恭喜你，猜对了！";
+			} else if (guess < randomNumber) {
+				document.getElementById("message").innerHTML = "猜小了，请再试一次。";
+			} else {
+				document.getElementById("message").innerHTML = "猜大了，请再试一次。";
+			}
+		}
+	</script>
+</body>
+</html>
