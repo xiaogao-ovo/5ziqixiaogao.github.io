@@ -1,88 +1,109 @@
-// 获取 DOM 元素
-const btnEasy = document.querySelector('#btn-easy');
-const btnMedium = document.querySelector('#btn-medium');
-const btnHard = document.querySelector('#btn-hard');
-const btnSubmit = document.querySelector('#btn-submit');
-const btnNewGame = document.querySelector('#btn-new-game');
-const guessInput = document.querySelector('#guess');
-const message = document.querySelector('#message');
-const attempts = document.querySelector('#attempts');
-const warning = document.querySelector('#warning');
-const gameSection = document.querySelector('#game-section');
+const chessboardEl = document.querySelector('.chessboard');
+// 定义棋盘大小及棋子大小
+const boardSize = 15;
+const chessSize = 30;
+// 游戏数据，记录棋子位置及玩家回合
+const gameData = {
+    player: 1,
+    board: [],
+    result: null
+};
 
-// 初始化游戏参数
-let randomNumber;
-let maxNumber;
-let totalAttempts = 0;
-
-// 绑定事件
-btnEasy.addEventListener('click', startGame);
-btnMedium.addEventListener('click', startGame);
-btnHard.addEventListener('click', startGame);
-btnSubmit.addEventListener('click', checkGuess);
-guessInput.addEventListener('input', validateInput);
-btnNewGame.addEventListener('click', confirmRestart);
-
-// 函数定义
-function startGame(event) {
-    switch (event.target.id) {
-        case 'btn-easy':
-            maxNumber = 10;
-            break;
-        case 'btn-medium':
-            maxNumber = 50;
-            break;
-        case 'btn-hard':
-            maxNumber = 100;
-            break;
-    }
-
-    // 更新游戏参数
-    randomNumber = Math.floor(Math.random() * (maxNumber + 1));
-    totalAttempts = 0;
-
-    // 更新 DOM
-    guessInput.value = '';
-    attempts.textContent = '';
-    warning.textContent = '';
-    message.textContent = '';
-    gameSection.classList.add('game-on');
-    btnSubmit.removeAttribute('disabled');
-    guessInput.removeAttribute('disabled');
+// 初始化游戏数据和棋盘
+function init() {
+    const board = Array.from({ length: boardSize }, () => Array.from({ length: boardSize }, () => 0));
+    gameData.board = board;
+    gameData.result = null;
+    renderChessboard();
 }
 
-function confirmRestart() {
-    if (confirm('确定要开始新游戏吗？')) {
-        gameSection.classList.remove('game-on');
+// 渲染棋盘
+function renderChessboard() {
+    for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+            const el = document.createElement('div');
+            el.className = 'chess';
+            el.style.left = (i * chessSize + chessSize) + 'px';
+            el.style.top = (j * chessSize + chessSize) + 'px';
+            el.dataset.x = i.toString();
+            el.dataset.y = j.toString();
+            chessboardEl.appendChild(el);
+        }
     }
 }
 
-function validateInput() {
-    guessInput.setCustomValidity('');
-    if (!guessInput.checkValidity()) {
-        guessInput.setCustomValidity('请输入一个有效的数字！');
+// 处理点击事件，下棋并判断胜负
+function handleClick(event) {
+    const target = event.target;
+    if (target.classList.contains('chess')) {
+        const x = parseInt(target.dataset.x);
+        const y = parseInt(target.dataset.y);
+        if (gameData.board[x][y] === 0) {
+            target.classList.add('opacity');
+            const player = gameData.player;
+            gameData.board[x][y] = player;
+            gameData.player = 3 - player;
+            const result = checkWin(x, y);
+            if (result) {
+                gameData.result = player;
+                alert(`玩家 ${player} 获胜！`);
+            }
+        }
     }
 }
 
-function checkGuess() {
-    let guess = parseInt(guessInput.value);
-    if (isNaN(guess)) {
-        warning.textContent = '请输入一个有效的数字！';
-        return;
+// 判断胜负
+function checkWin(x, y) {
+    const player = gameData.board[x][y];
+    let count;
+    // 判断横向是否连成五子
+    count = 1;
+    for (let i = x - 1; i >= 0 && gameData.board[i][y] === player; i--) {
+        count++;
     }
-    if (guess < 0 || guess > maxNumber) {
-        warning.textContent = '请输入一个 ' + maxNumber + ' 以内的数字！';
-        return;
+    for (let i = x + 1; i < boardSize && gameData.board[i][y] === player; i++) {
+        count++;
     }
-    totalAttempts++;
-    attempts.textContent = '你已经猜测了 ' + totalAttempts + ' 次。';
-    if (guess === randomNumber) {
-        message.textContent = '恭喜你，猜对了！正确答案是 ' + randomNumber + '。';
-        btnSubmit.setAttribute('disabled', true);
-        guessInput.setAttribute('disabled', true);
-    } else if (guess < randomNumber) {
-        message.textContent = '猜小了，请再试一次。';
-    } else {
-        message.textContent = '猜大了，请再试一次。';
+    if (count >= 5) {
+        return true;
     }
+    // 判断纵向是否连成五子
+    count = 1;
+    for (let i = y - 1; i >= 0 && gameData.board[x][i] === player; i--) {
+        count++;
+    }
+    for (let i = y + 1; i < boardSize && gameData.board[x][i] === player; i++) {
+        count++;
+    }
+    if (count >= 5) {
+        return true;
+    }
+    // 判断左上到右下是否连成五子
+    count = 1;
+    for (let i = x - 1, j = y - 1; i >= 0 && j >= 0 && gameData.board[i][j] === player; i--, j--) {
+        count++;
+    }
+    for (let i = x + 1, j = y + 1; i < boardSize && j < boardSize && gameData.board[i][j] === player; i++, j++) {
+        count++;
+    }
+    if (count >= 5) {
+        return true;
+    }
+    // 判断左下到右上是否连成五子
+    count = 1;
+    for (let i = x - 1, j = y + 1; i >= 0 && j < boardSize && gameData.board[i][j] === player; i--, j++) {
+        count++;
+    }
+    for (let i = x + 1, j = y - 1; i < boardSize && j >= 0 && gameData.board[i][j] === player; i++, j--) {
+        count++;
+    }
+    if (count >= 5) {
+        return true;
+    }
+    return false;
 }
+
+// 初始化游戏
+init();
+// 监听点击事件
+chessboardEl.addEventListener('click', handleClick);
